@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour
     [Header("Particle Systems")]
     public Transform ParticleRoot;
     public ParticleSystem JumpParticle;
+    public ParticleSystem WallJumpParticle;
     public ParticleSystem DashParticle;
     public ParticleSystem SlideParticle;
 
@@ -55,12 +56,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputController _input;
     [SerializeField] private GhostEffect _ghostEffect;
     [SerializeField] private Rigidbody2D _rigidbody;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
 
     private void Start()
     {
         _input = GetComponent<InputController>();
         _rigidbody = GetComponent<Rigidbody2D>();
         _ghostEffect = GetComponent<GhostEffect>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+
         _ghostEffect.enabled = false;
 
         DashParticle.Stop();
@@ -75,7 +79,9 @@ public class PlayerController : MonoBehaviour
         WallClimb();
         Move();
 
-        LastMoveDirection = _rigidbody.velocity;
+        HandleFlipX();
+
+        // LastMoveDirection = _rigidbody.velocity;
     }
 
     private void HandleCollision()
@@ -87,6 +93,9 @@ public class PlayerController : MonoBehaviour
         onRightWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer);
         onLeftWall = Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
         onWall = onRightWall || onLeftWall;
+
+        // which side player is facing
+        WallSide = onRightWall ? 1f : -1f;
 
         // reset jump ability
         canJump = onGround || onWall;
@@ -122,11 +131,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Jump(Vector2 jumpDir, bool wall)
+    private void Jump(Vector2 jumpDir, bool isWallJump)
     {
         _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 0);
         _rigidbody.velocity += jumpDir * JumpSpeed;
         hasJumped = true;
+
+        ParticleSystem jumpParticle = isWallJump ? WallJumpParticle : JumpParticle;
+        jumpParticle.Play();
     }
 
     private void HandleDash()
@@ -157,9 +169,6 @@ public class PlayerController : MonoBehaviour
             {
                 _rigidbody.velocity = new Vector2(0.0f, -WallClimbSpeed);
             }
-
-            WallSide = onRightWall ? 1f : -1f;
-            ParticleRoot.localScale = new Vector3(WallSide, 1f, 1f);
 
             // start play slide particle when player slides down wall
             if (_rigidbody.velocity.y < 0 && !SlideParticle.isPlaying)
@@ -196,6 +205,15 @@ public class PlayerController : MonoBehaviour
         {
             _rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, (new Vector2(MoveDirection.x * MoveSpeed, _rigidbody.velocity.y)), AirAcceleration * Time.deltaTime);
         }
+    }
+
+    private void HandleFlipX()
+    {
+        // handle player animation facing direction
+        _spriteRenderer.flipX = WallSide == 1;
+
+        // handle particle system direction
+        ParticleRoot.localScale = new Vector3(WallSide, 1f, 1f);
     }
 
     private IEnumerator DisableMovement(float time)
