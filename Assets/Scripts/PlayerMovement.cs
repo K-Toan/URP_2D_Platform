@@ -7,13 +7,17 @@ public class PlayerMovement : MonoBehaviour
     public float Damp = 1.2f;
 
     [Header("Move")]
-    public float MoveSpeed = 6f;
-    public float Acceleration = 6f;
+    public float MoveSpeed = 10f;
+    public float Acceleration = 10f;
+    public float AirAcceleration = 5f;
     public Vector2 MoveDirection;
     public Vector2 LastMoveDirection;
+    [SerializeField] private bool canMove = true;
 
     [Header("Jump")]
     public float JumpSpeed = 25f;
+    [SerializeField] private bool hasJumped = false;
+    [SerializeField] private bool canJump = true;
 
     [Header("Collision")]
     [SerializeField] private bool onGround;
@@ -21,8 +25,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool onRightWall;
     [SerializeField] private bool onLeftWall;
     // collision with ground and walls 
-    [SerializeField] private float collisionRadius = 0.1f;
-    [SerializeField] private Vector2 bottomOffset = new Vector2(0f, -0.5f),
+    [SerializeField] private float collisionRadius = 0.01f;
+    [SerializeField]
+    private Vector2 bottomOffset = new Vector2(0f, -0.5f),
                                      rightOffset = new Vector2(0.5f, 0f),
                                      leftOffset = new Vector2(-0.5f, 0f);
     [SerializeField] private LayerMask groundLayer;
@@ -44,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         HandleCollision();
-        Jump();
+        HandleJump();
         Move();
     }
 
@@ -57,42 +62,78 @@ public class PlayerMovement : MonoBehaviour
         onRightWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer);
         onLeftWall = Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
         onWall = onRightWall || onLeftWall;
+
+        // reset jump ability
+        canJump = onGround || onWall;
+        hasJumped = !canJump;
     }
 
-    private void Jump()
+    private void HandleJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && canJump)
         {
             // ground jump
             if (onGround)
             {
-                _rigidbody.velocity += Vector2.up * JumpSpeed;
+                Jump(Vector2.up, false);
             }
 
             // wall jump
             if (!onGround && onWall)
             {
-                Vector2 wallJumpDir = new Vector2(onRightWall ? -1.0f : 1.0f, 1.0f).normalized * JumpSpeed;
-                StartCoroutine(WallJump(wallJumpDir));
+                StartCoroutine(DisableMovement(0.25f));
+
+                Vector2 wallDir = onRightWall ? Vector2.left : Vector2.right;
+                Vector2 wallJumpDir = wallDir / 1.5f + Vector2.up / 1.5f;
+                Jump(wallJumpDir, true);
             }
         }
     }
 
-    private void Move()
+    private void Jump(Vector2 jumpDir, bool wall)
     {
-        if (_input.move.x != 0 && _input.move.y != 0)
-        {
-            LastMoveDirection = _input.move;
-        }
-        MoveDirection = _input.move;
-
-        // move with acceleration/force-like
-        _rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, (new Vector2(MoveDirection.x * MoveSpeed, _rigidbody.velocity.y)), Acceleration * Time.deltaTime);
+        _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, 0);
+        _rigidbody.velocity += jumpDir * JumpSpeed;
+        hasJumped = true;
     }
 
-    private IEnumerator WallJump(Vector2 jumpDir)
+    private void Move()
     {
-        _rigidbody.velocity = jumpDir;
-        yield return new WaitForSeconds(0.5f);
+        if(!canMove)
+            return;
+
+        // if (_input.move.x != 0 && _input.move.y != 0)
+        //     LastMoveDirection = _input.move;
+
+        MoveDirection = _input.move;
+
+        // change player acceleration if player has jumped
+        if (!hasJumped)
+        {
+            // _rigidbody.velocity = new Vector2(MoveDirection.x * MoveSpeed, _rigidbody.velocity.y);
+            _rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, (new Vector2(MoveDirection.x * MoveSpeed, _rigidbody.velocity.y)), Acceleration * Time.deltaTime);
+        }
+        else
+        {
+            _rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, (new Vector2(MoveDirection.x * MoveSpeed, _rigidbody.velocity.y)), AirAcceleration * Time.deltaTime);
+        }
+    }
+
+    IEnumerator DisableMovement(float time)
+    {
+        canMove = false;
+        yield return new WaitForSeconds(time);
+        canMove = true;
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+
+        var positions = new Vector2[] { bottomOffset, rightOffset, leftOffset };
+
+        Gizmos.DrawWireSphere((Vector2)transform.position + bottomOffset, collisionRadius);
+        Gizmos.DrawWireSphere((Vector2)transform.position + rightOffset, collisionRadius);
+        Gizmos.DrawWireSphere((Vector2)transform.position + leftOffset, collisionRadius);
     }
 }
