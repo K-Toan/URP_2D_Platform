@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
 
     [Header("Particle Systems")]
+    public Transform ParticleRoot;
     public ParticleSystem JumpParticle;
     public ParticleSystem DashParticle;
     public ParticleSystem SlideParticle;
@@ -73,6 +74,8 @@ public class PlayerController : MonoBehaviour
         HandleDash();
         WallClimb();
         Move();
+
+        LastMoveDirection = _rigidbody.velocity;
     }
 
     private void HandleCollision()
@@ -144,16 +147,35 @@ public class PlayerController : MonoBehaviour
         // check if player slides on wall
         if (onWall && !onGround)
         {
-            WallSide = onRightWall ? 1 : -1;
-
+            // climb up wall
             if (_input.move.y > 0)
             {
                 _rigidbody.velocity = new Vector2(0.0f, WallClimbSpeed);
             }
+            // slide down wall
             else if (_input.move.y < 0)
             {
                 _rigidbody.velocity = new Vector2(0.0f, -WallClimbSpeed);
             }
+
+            WallSide = onRightWall ? 1f : -1f;
+            ParticleRoot.localScale = new Vector3(WallSide, 1f, 1f);
+
+            // start play slide particle when player slides down wall
+            if (_rigidbody.velocity.y < 0 && !SlideParticle.isPlaying)
+            {
+                SlideParticle.Play();
+            }
+            // stop slide particle when player climbs up
+            else if (_rigidbody.velocity.y > 0 && SlideParticle.isPlaying)
+            {
+                SlideParticle.Stop();
+            }
+        }
+        // stop slide particle when player does not slide on wall
+        else
+        {
+            SlideParticle.Stop();
         }
     }
 
@@ -185,20 +207,29 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Dash(Vector2 dashDir)
     {
+        // temp
         float gravityScale = _rigidbody.gravityScale;
 
+        // start play ghost effect in DashTime
         _ghostEffect.Play(DashTime);
 
-        DashParticle.Play();
         hasDashed = true;
         canDash = false;
+
+        // play dash particle
+        DashParticle.Play();
+        // disable gravity and move player
         _rigidbody.gravityScale = 0f;
         _rigidbody.velocity = dashDir.normalized * DashSpeed;
 
+        // cooldown
         yield return new WaitForSeconds(DashTime);
 
-        DashParticle.Stop();
         canDash = true;
+
+        // stop dash particle
+        DashParticle.Stop();
+        // disable gravity and stop player
         _rigidbody.gravityScale = gravityScale;
         _rigidbody.velocity = Vector2.zero;
     }
