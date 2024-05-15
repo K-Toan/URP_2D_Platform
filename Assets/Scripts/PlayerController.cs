@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [Header("Stats")]
     public float Damp = 1.2f;
@@ -27,6 +27,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool canDash = true;
     [SerializeField] private bool hasDashed = false;
 
+    [Header("Wall")]
+    public float WallClimbSpeed = 5f;
+    public float WallSlideSpeed = 5f;
+    public float WallSide;
+
     [Header("Collision")]
     [SerializeField] private bool onGround;
     [SerializeField] private bool onWall;
@@ -40,14 +45,25 @@ public class PlayerMovement : MonoBehaviour
                                      leftOffset = new Vector2(-0.5f, 0f);
     [SerializeField] private LayerMask groundLayer;
 
+    [Header("Particle Systems")]
+    public ParticleSystem JumpParticle;
+    public ParticleSystem DashParticle;
+    public ParticleSystem SlideParticle;
+
     [Header("Components")]
     [SerializeField] private InputController _input;
+    [SerializeField] private GhostEffect _ghostEffect;
     [SerializeField] private Rigidbody2D _rigidbody;
 
     private void Start()
     {
         _input = GetComponent<InputController>();
         _rigidbody = GetComponent<Rigidbody2D>();
+        _ghostEffect = GetComponent<GhostEffect>();
+        _ghostEffect.enabled = false;
+
+        DashParticle.Stop();
+        SlideParticle.Stop();
     }
 
     private void Update()
@@ -55,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
         HandleCollision();
         HandleJump();
         HandleDash();
+        WallClimb();
         Move();
     }
 
@@ -122,20 +139,22 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private IEnumerator Dash(Vector2 dashDir)
+    private void WallClimb()
     {
-        float gravityScale = _rigidbody.gravityScale;
+        // check if player slides on wall
+        if (onWall && !onGround)
+        {
+            WallSide = onRightWall ? 1 : -1;
 
-        canDash = false;
-        hasDashed = true;
-        _rigidbody.gravityScale = 0f;
-        _rigidbody.velocity = dashDir.normalized * DashSpeed;
-
-        yield return new WaitForSeconds(DashTime);
-
-        canDash = true;
-        _rigidbody.gravityScale = gravityScale;
-        _rigidbody.velocity = Vector2.zero;
+            if (_input.move.y > 0)
+            {
+                _rigidbody.velocity = new Vector2(0.0f, WallClimbSpeed);
+            }
+            else if (_input.move.y < 0)
+            {
+                _rigidbody.velocity = new Vector2(0.0f, -WallClimbSpeed);
+            }
+        }
     }
 
     private void Move()
@@ -162,6 +181,26 @@ public class PlayerMovement : MonoBehaviour
         canMove = false;
         yield return new WaitForSeconds(time);
         canMove = true;
+    }
+
+    private IEnumerator Dash(Vector2 dashDir)
+    {
+        float gravityScale = _rigidbody.gravityScale;
+
+        _ghostEffect.Play(DashTime);
+
+        DashParticle.Play();
+        hasDashed = true;
+        canDash = false;
+        _rigidbody.gravityScale = 0f;
+        _rigidbody.velocity = dashDir.normalized * DashSpeed;
+
+        yield return new WaitForSeconds(DashTime);
+
+        DashParticle.Stop();
+        canDash = true;
+        _rigidbody.gravityScale = gravityScale;
+        _rigidbody.velocity = Vector2.zero;
     }
 
     // private IEnumerator DisableGravity(float time)
