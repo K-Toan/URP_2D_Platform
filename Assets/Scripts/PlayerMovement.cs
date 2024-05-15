@@ -14,10 +14,16 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 LastMoveDirection;
     [SerializeField] private bool canMove = true;
 
-    [Header("Jump")]
+    [Header("Jump & Gravity")]
     public float JumpSpeed = 25f;
     [SerializeField] private bool hasJumped = false;
     [SerializeField] private bool canJump = true;
+    [SerializeField] private bool useGravity = true;
+
+    [Header("Dash")]
+    public float DashSpeed = 25f;
+    public float DashTime = 0.2f;
+    [SerializeField] private bool canDash = true;
 
     [Header("Collision")]
     [SerializeField] private bool onGround;
@@ -31,10 +37,6 @@ public class PlayerMovement : MonoBehaviour
                                      rightOffset = new Vector2(0.5f, 0f),
                                      leftOffset = new Vector2(-0.5f, 0f);
     [SerializeField] private LayerMask groundLayer;
-
-    [Header("Dash")]
-    public float DashSpeed = 10f;
-    public float DashTime = 0.2f;
 
     [Header("Components")]
     [SerializeField] private InputController _input;
@@ -97,13 +99,29 @@ public class PlayerMovement : MonoBehaviour
         hasJumped = true;
     }
 
+    private void HandleDash()
+    {
+
+    }
+
+    private IEnumerator Dash(Vector2 dashDir)
+    {
+        float gravityScale = _rigidbody.gravityScale;
+
+        _rigidbody.gravityScale = 0f;
+        _rigidbody.velocity = dashDir.normalized * DashSpeed;
+
+        yield return new WaitForSeconds(0.3f);
+
+        _rigidbody.gravityScale = _rigidbody.gravityScale;
+        _rigidbody.velocity = dashDir * DashSpeed;
+
+    }
+
     private void Move()
     {
-        if(!canMove)
+        if (!canMove)
             return;
-
-        // if (_input.move.x != 0 && _input.move.y != 0)
-        //     LastMoveDirection = _input.move;
 
         MoveDirection = _input.move;
 
@@ -119,11 +137,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    IEnumerator DisableMovement(float time)
+    private IEnumerator DisableMovement(float time)
     {
         canMove = false;
         yield return new WaitForSeconds(time);
         canMove = true;
+    }
+
+    private IEnumerator DisableGravity(float time)
+    {
+        useGravity = false;
+        yield return new WaitForSeconds(time);
+        useGravity = true;
     }
 
     void OnDrawGizmos()
