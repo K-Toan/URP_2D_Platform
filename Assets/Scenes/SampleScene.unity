@@ -1151,9 +1151,14 @@ MonoBehaviour:
   MoveDirection: {x: 0, y: 0}
   LastMoveDirection: {x: 0, y: 0}
   canMove: 1
-  JumpSpeed: 20
-  hasJumped: 0
+  JumpSpeed: 25
   canJump: 1
+  hasJumped: 0
+  useGravity: 1
+  DashSpeed: 25
+  DashTime: 0.2
+  canDash: 1
+  hasDashed: 0
   onGround: 0
   onWall: 0
   onRightWall: 0
@@ -1165,8 +1170,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  DashSpeed: 10
-  DashTime: 0.2
   _input: {fileID: 0}
   _rigidbody: {fileID: 0}
 --- !u!1 &1799916740

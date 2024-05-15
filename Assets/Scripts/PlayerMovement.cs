@@ -14,16 +14,18 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 LastMoveDirection;
     [SerializeField] private bool canMove = true;
 
-    [Header("Jump & Gravity")]
+    [Header("Jump")]
     public float JumpSpeed = 25f;
-    [SerializeField] private bool hasJumped = false;
+    public float WallJumpTime = 0.2f; // time to enable movement after wall jump
     [SerializeField] private bool canJump = true;
-    [SerializeField] private bool useGravity = true;
+    [SerializeField] private bool hasJumped = false;
+    // [SerializeField] private bool useGravity = true;
 
     [Header("Dash")]
     public float DashSpeed = 25f;
-    public float DashTime = 0.2f;
+    public float DashTime = 0.15f;
     [SerializeField] private bool canDash = true;
+    [SerializeField] private bool hasDashed = false;
 
     [Header("Collision")]
     [SerializeField] private bool onGround;
@@ -52,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleCollision();
         HandleJump();
+        HandleDash();
         Move();
     }
 
@@ -68,6 +71,13 @@ public class PlayerMovement : MonoBehaviour
         // reset jump ability
         canJump = onGround || onWall;
         hasJumped = !canJump;
+
+        // reset dash ability
+        // if player has dashed and on the ground then enable to dash again
+        if (hasDashed && onGround)
+        {
+            hasDashed = false;
+        }
     }
 
     private void HandleJump()
@@ -83,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
             // wall jump
             if (!onGround && onWall)
             {
-                StartCoroutine(DisableMovement(0.25f));
+                StartCoroutine(DisableMovement(WallJumpTime));
 
                 Vector2 wallDir = onRightWall ? Vector2.left : Vector2.right;
                 Vector2 wallJumpDir = wallDir / 1.5f + Vector2.up / 1.5f;
@@ -101,21 +111,31 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleDash()
     {
+        if (!canDash || hasDashed)
+            return;
 
+        if (_input.dash)
+        {
+            // disable movement and start dash
+            StartCoroutine(DisableMovement(DashTime));
+            StartCoroutine(Dash(MoveDirection));
+        }
     }
 
     private IEnumerator Dash(Vector2 dashDir)
     {
         float gravityScale = _rigidbody.gravityScale;
 
+        canDash = false;
+        hasDashed = true;
         _rigidbody.gravityScale = 0f;
         _rigidbody.velocity = dashDir.normalized * DashSpeed;
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(DashTime);
 
-        _rigidbody.gravityScale = _rigidbody.gravityScale;
-        _rigidbody.velocity = dashDir * DashSpeed;
-
+        canDash = true;
+        _rigidbody.gravityScale = gravityScale;
+        _rigidbody.velocity = Vector2.zero;
     }
 
     private void Move()
@@ -144,12 +164,12 @@ public class PlayerMovement : MonoBehaviour
         canMove = true;
     }
 
-    private IEnumerator DisableGravity(float time)
-    {
-        useGravity = false;
-        yield return new WaitForSeconds(time);
-        useGravity = true;
-    }
+    // private IEnumerator DisableGravity(float time)
+    // {
+    //     useGravity = false;
+    //     yield return new WaitForSeconds(time);
+    //     useGravity = true;
+    // }
 
     void OnDrawGizmos()
     {
