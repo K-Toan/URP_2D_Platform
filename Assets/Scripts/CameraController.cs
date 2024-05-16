@@ -1,9 +1,11 @@
 using UnityEngine;
 
-public class CameraFollowPlayer : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
     [Header("Stats")]
-    public float Damp = 1.2f;
+    public float Damp = 3f;
+
+    [Header("Screen shake")]
 
     [Header("Followed target")]
     public Transform Target;

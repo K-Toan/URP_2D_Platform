@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Stats")]
-    public float Damp = 1.2f;
-
     [Header("Move")]
     public float MoveSpeed = 10f;
     public float Acceleration = 10f;
