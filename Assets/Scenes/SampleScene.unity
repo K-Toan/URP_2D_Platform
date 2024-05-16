@@ -1192,24 +1192,27 @@ MonoBehaviour:
   WallJumpTime: 0.2
   canJump: 1
   hasJumped: 0
-  DashSpeed: 25
-  DashTime: 0.15
+  DashSpeed: 20
+  DashTime: 0.2
+  DashCooldownTime: 0.1
   canDash: 1
   hasDashed: 0
   WallClimbSpeed: 5
   WallSlideSpeed: 5
   WallSide: 0
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
   onGround: 0
   onWall: 0
   onRightWall: 0
   onLeftWall: 0
-  collisionRadius: 0.01
-  bottomOffset: {x: 0, y: -0.5}
-  rightOffset: {x: 0.5, y: 0}
-  leftOffset: {x: -0.5, y: 0}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  bottomOffsetUpLeft: {x: -0.4, y: -0.45}
+  bottomOffsetDownRight: {x: 0.4, y: -0.55}
+  rightOffsetUpLeft: {x: 0.49, y: 0.4}
+  rightOffsetDownRight: {x: 0.51, y: -0.5}
+  leftOffsetUpLeft: {x: -0.51, y: 0.4}
+  leftOffsetDownRight: {x: -0.49, y: -0.5}
   ParticleRoot: {fileID: 208444073}
   JumpParticle: {fileID: 5810601983770172233}
   WallJumpParticle: {fileID: 2326434415171620273}

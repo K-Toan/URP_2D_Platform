@@ -22,8 +22,9 @@ public class PlayerController : MonoBehaviour
     // [SerializeField] private bool useGravity = true;
 
     [Header("Dash")]
-    public float DashSpeed = 25f;
-    public float DashTime = 0.15f;
+    public float DashSpeed = 20f;
+    public float DashTime = 0.2f;
+    public float DashCooldownTime = 0.1f;
     [SerializeField] private bool canDash = true;
     [SerializeField] private bool hasDashed = false;
 
@@ -33,17 +34,30 @@ public class PlayerController : MonoBehaviour
     public float WallSide;
 
     [Header("Collision")]
+    [SerializeField] private LayerMask groundLayer;
     [SerializeField] private bool onGround;
     [SerializeField] private bool onWall;
     [SerializeField] private bool onRightWall;
     [SerializeField] private bool onLeftWall;
     // collision with ground and walls 
-    [SerializeField] private float collisionRadius = 0.01f;
+    // ground collision
     [SerializeField]
-    private Vector2 bottomOffset = new Vector2(0f, -0.5f),
-                                     rightOffset = new Vector2(0.5f, 0f),
-                                     leftOffset = new Vector2(-0.5f, 0f);
-    [SerializeField] private LayerMask groundLayer;
+    private Vector2 bottomOffsetUpLeft = new Vector2(-0.4f, -0.45f),
+                    // bottomOffsetUpRight = new Vector2(0.4f, -0.45f),
+                    // bottomOffsetDownLeft = new Vector2(-0.4f, -0.55f),
+                    bottomOffsetDownRight = new Vector2(0.4f, -0.55f);
+    // right wall collision
+    [SerializeField]
+    private Vector2 rightOffsetUpLeft = new Vector2(0.49f, 0.4f),
+                    // rightOffsetUpRight = new Vector2(0.51f, 0.4f),
+                    // rightOffsetDownLeft = new Vector2(0.49f, -0.5f),
+                    rightOffsetDownRight = new Vector2(0.51f, -0.5f);
+    // left wall collision
+    [SerializeField]
+    private Vector2 leftOffsetUpLeft = new Vector2(-0.51f, 0.4f),
+                    // leftOffsetUpRight = new Vector2(-0.49f, 0.4f),
+                    // leftOffsetDownLeft = new Vector2(-0.51f, -0.5f),
+                    leftOffsetDownRight = new Vector2(-0.49f, -0.5f);
 
     [Header("Particle Systems")]
     public Transform ParticleRoot;
@@ -86,12 +100,19 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCollision()
     {
+        // 
+        Vector2 currentPosition = (Vector2)transform.position;
         // ground detection
-        onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
+        // onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
+        onGround = Physics2D.OverlapArea(currentPosition + bottomOffsetUpLeft, (Vector2)transform.position + bottomOffsetDownRight, groundLayer);
 
         // wall detection
-        onRightWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer);
-        onLeftWall = Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
+        // onRightWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer);
+        onRightWall = Physics2D.OverlapArea(currentPosition + rightOffsetUpLeft, (Vector2)transform.position + rightOffsetDownRight, groundLayer);
+        // onLeftWall = Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
+        onLeftWall = Physics2D.OverlapArea(currentPosition + leftOffsetUpLeft, (Vector2)transform.position + leftOffsetDownRight, groundLayer);
+
+        // if player is on wall
         onWall = onRightWall || onLeftWall;
 
         // which side player is facing
@@ -243,13 +264,15 @@ public class PlayerController : MonoBehaviour
         // cooldown
         yield return new WaitForSeconds(DashTime);
 
-        canDash = true;
-
         // stop dash particle
         DashParticle.Stop();
         // disable gravity and stop player
         _rigidbody.gravityScale = gravityScale;
         _rigidbody.velocity = Vector2.zero;
+
+        // cooldown after dash
+        yield return new WaitForSeconds(DashCooldownTime);
+        canDash = true;
     }
 
     // private IEnumerator DisableGravity(float time)
@@ -258,15 +281,4 @@ public class PlayerController : MonoBehaviour
     //     yield return new WaitForSeconds(time);
     //     useGravity = true;
     // }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-
-        var positions = new Vector2[] { bottomOffset, rightOffset, leftOffset };
-
-        Gizmos.DrawWireSphere((Vector2)transform.position + bottomOffset, collisionRadius);
-        Gizmos.DrawWireSphere((Vector2)transform.position + rightOffset, collisionRadius);
-        Gizmos.DrawWireSphere((Vector2)transform.position + leftOffset, collisionRadius);
-    }
 }
