@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
 
         // reset dash ability
         // if player has dashed and on the ground then enable to dash again
-        if (hasDashed && onGround)
+        if (hasDashed && onGround && canDash)
         {
             hasDashed = false;
         }
@@ -169,9 +169,16 @@ public class PlayerController : MonoBehaviour
 
         if (_input.dash)
         {
+            // recalculate dash dir if player does not input move dir
+            Vector2 dashDir = MoveDirection;
+            if (dashDir == Vector2.zero)
+            {
+                dashDir = new Vector2(_spriteRenderer.flipX ? 1f : -1f, 0f);
+            }
+
             // disable movement and start dash
             StartCoroutine(DisableMovement(DashTime));
-            StartCoroutine(Dash(MoveDirection));
+            StartCoroutine(Dash(dashDir));
         }
     }
 
@@ -216,6 +223,12 @@ public class PlayerController : MonoBehaviour
 
         MoveDirection = _input.move;
 
+        // store the last move direction if player does move
+        if (_input.move.x != 0 && _input.move.y != 0)
+        {
+            LastMoveDirection = MoveDirection;
+        }
+
         // change player acceleration if player has jumped
         if (!hasJumped)
         {
@@ -231,7 +244,14 @@ public class PlayerController : MonoBehaviour
     private void HandleFlipX()
     {
         // handle player animation facing direction
-        _spriteRenderer.flipX = WallSide == 1;
+        if (_input.move.x > 0)
+        {
+            _spriteRenderer.flipX = true;
+        }
+        else if (_input.move.x < 0)
+        {
+            _spriteRenderer.flipX = false;
+        }
 
         // handle particle system direction
         ParticleRoot.localScale = new Vector3(WallSide, 1f, 1f);
