@@ -91,8 +91,6 @@ public class PlayerController : MonoBehaviour
         Move();
 
         HandleFlipX();
-
-        // LastMoveDirection = _rigidbody.velocity;
     }
 
     private void HandleCollision()
@@ -168,6 +166,7 @@ public class PlayerController : MonoBehaviour
         {
             // recalculate dash dir if player does not input move dir
             Vector2 dashDir = MoveDirection;
+            // if player not inputs, dash towards face direction 
             if (dashDir == Vector2.zero)
             {
                 dashDir = new Vector2(_spriteRenderer.flipX ? 1f : -1f, 0f);
