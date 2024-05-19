@@ -28,12 +28,10 @@ public class EnemyController : MonoBehaviour
             var player = other.gameObject.GetComponent<PlayerController>();
             if (MoveDir.x * player.MoveDirection.x >= 0)
             {
-                Debug.Log("cùng hướng");
                 player.TakeDamage();
             }
             else
             {
-                Debug.Log("khác hướng");
                 Destroy(gameObject);
             }
             MoveDir.x *= -1f;

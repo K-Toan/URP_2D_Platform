@@ -39,7 +39,7 @@ public class Spawner : MonoBehaviour
 
         GameObject enemy = Instantiate(Enemy, spawnPosition, Quaternion.identity);
 
-        enemy.GetComponent<EnemyController>().MoveSpeed *= Random.value;
+        enemy.GetComponent<EnemyController>().MoveSpeed *= Random.value + 1f;
         enemy.GetComponent<EnemyController>().MoveDir.x = Random.value;
         enemy.GetComponent<EnemyController>().MoveDir.y = Random.value;
 
@@ -70,6 +70,6 @@ public class Spawner : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position, new Vector3(EnemySpawnRadius * 2f, 0.1f, EnemySpawnRadius * 2f));
+        Gizmos.DrawWireCube(transform.position, new Vector3(EnemySpawnRadius * 2f, EnemySpawnRadius * 2f));
     }
 }
