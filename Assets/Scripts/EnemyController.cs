@@ -6,10 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     [Header("Stats")]
     public float MoveSpeed = 5f;
-    public Vector2 MoveDir = Vector2.zero;
-
-    private float moveSpeed;
-    private Vector2 moveDir;
+    public Vector2 MoveDir;
 
     [Header("Components")]
     [SerializeField] private Rigidbody2D _rigidbody;
@@ -17,19 +14,11 @@ public class EnemyController : MonoBehaviour
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
-        Redirect();
-    }
-
-    private void Redirect()
-    {
-        // moveSpeed = Random.value * MoveSpeed;
-        moveSpeed = Random.value * MoveSpeed + 2f;
-        moveDir = Vector2.left;
     }
 
     private void Update()
     {
-        _rigidbody.velocity = moveSpeed * moveDir;
+        _rigidbody.velocity = MoveDir.normalized * MoveSpeed;
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -37,7 +26,7 @@ public class EnemyController : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             var player = other.gameObject.GetComponent<PlayerController>();
-            if (moveDir.x * player.MoveDirection.x >= 0)
+            if (MoveDir.x * player.MoveDirection.x >= 0)
             {
                 Debug.Log("cùng hướng");
                 player.TakeDamage();
@@ -47,12 +36,15 @@ public class EnemyController : MonoBehaviour
                 Debug.Log("khác hướng");
                 Destroy(gameObject);
             }
-            moveDir.x *= -1f;
+            MoveDir.x *= -1f;
         }
         if (other.gameObject.layer == LayerMask.NameToLayer("Environment"))
         {
-            // Nếu va chạm với environment, đảo hướng di chuyển của enemy
-            moveDir.x *= -1f;
+            // enemy bounce dir when collide with wall
+            Vector2 normal = other.contacts[0].normal;
+            Vector2 bounceDirection = Vector2.Reflect(MoveDir.normalized, normal);
+
+            MoveDir = bounceDirection;
         }
     }
 }

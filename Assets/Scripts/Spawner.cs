@@ -19,10 +19,33 @@ public class Spawner : MonoBehaviour
     public GameObject Player;
     public GameObject Enemy;
 
+    [Header("Pools")]
+    List<GameObject> _enemies = new List<GameObject>();
+
     private void Start()
     {
         SpawnPlayer();
+        for (int i = 0; i < EnemyAmount; i++)
+        {
+            _enemies.Add(CreateEnemy());
+        }
         StartCoroutine(SpawnEnemies());
+    }
+
+    private GameObject CreateEnemy()
+    {
+        Vector2 randomPoint = Random.insideUnitCircle * EnemySpawnRadius;
+        Vector2 spawnPosition = transform.position + new Vector3(randomPoint.x, randomPoint.y);
+
+        GameObject enemy = Instantiate(Enemy, spawnPosition, Quaternion.identity);
+
+        enemy.GetComponent<EnemyController>().MoveSpeed *= Random.value;
+        enemy.GetComponent<EnemyController>().MoveDir.x = Random.value;
+        enemy.GetComponent<EnemyController>().MoveDir.y = Random.value;
+
+        enemy.SetActive(false);
+
+        return enemy;
     }
 
     private void Update()
@@ -37,13 +60,9 @@ public class Spawner : MonoBehaviour
 
     private IEnumerator SpawnEnemies()
     {
-        while (enemyCount++ < EnemyAmount)
+        foreach(var enemy in _enemies)
         {
-            Vector2 randomPoint = Random.insideUnitCircle * EnemySpawnRadius;
-            Vector3 spawnPosition = transform.position + new Vector3(randomPoint.x, 0f, randomPoint.y);
-
-            Instantiate(Enemy, spawnPosition, Quaternion.identity);
-
+            enemy.SetActive(true);
             yield return new WaitForSeconds(EnemyInterval);
         }
     }

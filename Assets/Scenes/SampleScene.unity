@@ -1253,7 +1253,7 @@ Transform:
   m_GameObject: {fileID: 1263197551}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 13, z: 0}
+  m_LocalPosition: {x: 0, y: 11.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1272,7 +1272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 5
-  MoveDir: {x: 0, y: 0}
+  MoveDir: {x: -1, y: -1}
   _rigidbody: {fileID: 0}
 --- !u!1 &1304516534
 GameObject:
@@ -1754,7 +1754,7 @@ Transform:
   m_GameObject: {fileID: 1803346199}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1774,7 +1774,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce2b56e82e42c24ea4fa7adb7d30435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnemyAmount: 20
+  EnemyAmount: 10
   EnemyInterval: 1
   EnemySpawnPosition: {fileID: 1304516535}
   EnemySpawnRadius: 5
