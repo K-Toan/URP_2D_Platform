@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Stats")]
+    public float Health = 1f;
+    public Transform SpawnPoint;
+
     [Header("Move")]
     public float MoveSpeed = 10f;
     public float Acceleration = 10f;
@@ -291,10 +295,8 @@ public class PlayerController : MonoBehaviour
         canDash = true;
     }
 
-    // private IEnumerator DisableGravity(float time)
-    // {
-    //     useGravity = false;
-    //     yield return new WaitForSeconds(time);
-    //     useGravity = true;
-    // }
+    public void TakeDamage()
+    {
+        transform.position = SpawnPoint.position;
+    }
 }
