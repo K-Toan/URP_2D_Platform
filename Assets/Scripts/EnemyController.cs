@@ -32,11 +32,12 @@ public class EnemyController : MonoBehaviour
             }
             else
             {
-                Destroy(gameObject);
+                // Destroy(gameObject);
+                gameObject.SetActive(false);
             }
             MoveDir.x *= -1f;
         }
-        if (other.gameObject.layer == LayerMask.NameToLayer("Environment"))
+        else if (other.gameObject.layer == LayerMask.NameToLayer("Environment"))
         {
             // enemy bounce dir when collide with wall
             Vector2 normal = other.contacts[0].normal;

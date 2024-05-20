@@ -6,7 +6,6 @@ public class Spawner : MonoBehaviour
 {
     [Header("Stats")]
     public int EnemyAmount = 20;
-    private int enemyCount = 0;
     public float EnemyInterval = 1f;
 
     [Header("Enemy Spawn Position")]
@@ -24,11 +23,11 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        SpawnPlayer();
         for (int i = 0; i < EnemyAmount; i++)
         {
             _enemies.Add(CreateEnemy());
         }
+        SpawnPlayer();
         StartCoroutine(SpawnEnemies());
     }
 
@@ -40,8 +39,8 @@ public class Spawner : MonoBehaviour
         GameObject enemy = Instantiate(Enemy, spawnPosition, Quaternion.identity);
 
         enemy.GetComponent<EnemyController>().MoveSpeed *= Random.value + 1f;
-        enemy.GetComponent<EnemyController>().MoveDir.x = Random.value;
-        enemy.GetComponent<EnemyController>().MoveDir.y = Random.value;
+        enemy.GetComponent<EnemyController>().MoveDir.x = Random.Range(-1f, 1f);
+        enemy.GetComponent<EnemyController>().MoveDir.y = Random.Range(-1f, 1f);
 
         enemy.SetActive(false);
 
