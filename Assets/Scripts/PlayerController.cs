@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     public float WallClimbSpeed = 5f;
     public float WallSlideSpeed = 5f;
     public float WallSide;
+    public float WallJumpUpTime = 0.5f;
+    [SerializeField] private bool canClimb = true;
 
     [Header("Collision")]
     [SerializeField] private LayerMask groundLayer;
@@ -142,7 +144,7 @@ public class PlayerController : MonoBehaviour
             // wall jump
             if (!onGround && onWall)
             {
-                StartCoroutine(DisableMovement(WallJumpTime));
+                StartCoroutine(DisableMove(WallJumpTime));
 
                 Vector2 wallDir = onRightWall ? Vector2.left : Vector2.right;
 
@@ -150,14 +152,13 @@ public class PlayerController : MonoBehaviour
                 // wall jump up
                 if (_rigidbody.velocity.y > 0)
                 {
-                    wallJumpDir = Vector2.up + wallDir / 2;
-
+                    wallJumpDir = Vector2.up;
+                    StartCoroutine(DisableClimb(WallJumpUpTime));
                 }
                 // wall jump
                 else
                 {
                     wallJumpDir = wallDir / 1.5f + Vector2.up / 1.5f;
-
                 }
 
                 Jump(wallJumpDir.normalized, true);
@@ -191,13 +192,17 @@ public class PlayerController : MonoBehaviour
             }
 
             // disable movement and start dash
-            StartCoroutine(DisableMovement(DashTime));
+            StartCoroutine(DisableMove(DashTime));
+            StartCoroutine(DisableClimb(DashTime));
             StartCoroutine(Dash(dashDir));
         }
     }
 
     private void WallClimb()
     {
+        if (!canClimb)
+            return;
+
         // check if player slides on wall
         if (onWall && !onGround)
         {
@@ -271,11 +276,18 @@ public class PlayerController : MonoBehaviour
         ParticleRoot.localScale = new Vector3(WallSide, 1f, 1f);
     }
 
-    private IEnumerator DisableMovement(float time)
+    private IEnumerator DisableMove(float time)
     {
         canMove = false;
         yield return new WaitForSeconds(time);
         canMove = true;
+    }
+
+    private IEnumerator DisableClimb(float time)
+    {
+        canClimb = false;
+        yield return new WaitForSeconds(time);
+        canClimb = true;
     }
 
     private IEnumerator Dash(Vector2 dashDir)
