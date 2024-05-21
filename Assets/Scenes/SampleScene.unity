@@ -443,7 +443,7 @@ Transform:
   m_GameObject: {fileID: 296185858}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: -5.5, z: 0}
+  m_LocalPosition: {x: -6.5, y: 9.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -599,7 +599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 551f1676602d57548b5cc6012757b69c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damp: 3
+  Damp: 5
   Target: {fileID: 1362387418}
 --- !u!1 &619394800
 GameObject:
@@ -1272,7 +1272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 5
-  MoveDir: {x: -1, y: -1}
+  MoveDirection: {x: 0, y: 0}
   _rigidbody: {fileID: 0}
 --- !u!1 &1304516534
 GameObject:
@@ -1552,7 +1552,7 @@ MonoBehaviour:
   hasJumped: 0
   DashSpeed: 20
   DashTime: 0.2
-  DashCooldownTime: 0.1
+  DashCooldownTime: 0.25
   canDash: 1
   hasDashed: 0
   WallClimbSpeed: 5
@@ -1769,12 +1769,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1803346199}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ce2b56e82e42c24ea4fa7adb7d30435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnemyAmount: 10
+  EnemyAmount: 20
   EnemyInterval: 1
   EnemySpawnPosition: {fileID: 1304516535}
   EnemySpawnRadius: 5

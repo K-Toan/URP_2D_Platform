@@ -6,7 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     [Header("Stats")]
     public float MoveSpeed = 5f;
-    public Vector2 MoveDir;
+    public Vector2 MoveDirection;
 
     [Header("Components")]
     [SerializeField] private Rigidbody2D _rigidbody;
@@ -18,7 +18,7 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        _rigidbody.velocity = MoveDir.normalized * MoveSpeed;
+        _rigidbody.velocity = MoveDirection.normalized * MoveSpeed;
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -26,7 +26,7 @@ public class EnemyController : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             var player = other.gameObject.GetComponent<PlayerController>();
-            if (MoveDir.x * player.MoveDirection.x >= 0)
+            if (MoveDirection.x * player.MoveDirection.x >= 0)
             {
                 player.TakeDamage();
             }
@@ -35,15 +35,12 @@ public class EnemyController : MonoBehaviour
                 // Destroy(gameObject);
                 gameObject.SetActive(false);
             }
-            MoveDir.x *= -1f;
         }
-        else if (other.gameObject.layer == LayerMask.NameToLayer("Environment"))
-        {
-            // enemy bounce dir when collide with wall
-            Vector2 normal = other.contacts[0].normal;
-            Vector2 bounceDirection = Vector2.Reflect(MoveDir.normalized, normal);
+        
+        // enemy bounce dir when collide with gameobject
+        Vector2 normal = other.contacts[0].normal;
+        Vector2 bounceDirection = Vector2.Reflect(MoveDirection.normalized, normal);
 
-            MoveDir = bounceDirection;
-        }
+        MoveDirection = bounceDirection;
     }
 }

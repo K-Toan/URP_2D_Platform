@@ -89,9 +89,9 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandleCollision();
+        WallClimb();
         HandleJump();
         HandleDash();
-        WallClimb();
         Move();
 
         HandleFlipX();
@@ -145,8 +145,22 @@ public class PlayerController : MonoBehaviour
                 StartCoroutine(DisableMovement(WallJumpTime));
 
                 Vector2 wallDir = onRightWall ? Vector2.left : Vector2.right;
-                Vector2 wallJumpDir = wallDir / 1.5f + Vector2.up / 1.5f;
-                Jump(wallJumpDir, true);
+
+                Vector2 wallJumpDir;
+                // wall jump up
+                if (_rigidbody.velocity.y > 0)
+                {
+                    wallJumpDir = Vector2.up + wallDir / 2;
+
+                }
+                // wall jump
+                else
+                {
+                    wallJumpDir = wallDir / 1.5f + Vector2.up / 1.5f;
+
+                }
+
+                Jump(wallJumpDir.normalized, true);
             }
         }
     }

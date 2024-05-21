@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GhostEffect : MonoBehaviour
@@ -34,7 +33,6 @@ public class GhostEffect : MonoBehaviour
         // adjust sprite color and sorting order
         SpriteRenderer sr = ghost.AddComponent<SpriteRenderer>();
         sr.sortingOrder = _spriteRenderer.sortingOrder - 1;
-
         return ghost;
     }
 
@@ -43,12 +41,12 @@ public class GhostEffect : MonoBehaviour
         delayTimeCounter -= Time.deltaTime;
         if (delayTimeCounter < 0)
         {
-            // Instantiate Ghost Prefab
+            // instantiate Ghost Prefab
             GameObject ghost = Instantiate(_ghost, transform.position, transform.rotation);
-            ghost.GetComponent<SpriteRenderer>().sprite = _spriteRenderer.sprite; // Render sprite của nhân vật
+            ghost.GetComponent<SpriteRenderer>().sprite = _spriteRenderer.sprite; // Render sprite
             ghost.GetComponent<SpriteRenderer>().color = GhostColor;
 
-            // Bắt đầu fade out
+            // start fade out
             StartCoroutine(FadeOut(ghost));
 
             // reset timer

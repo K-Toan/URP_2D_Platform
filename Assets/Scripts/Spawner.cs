@@ -39,8 +39,8 @@ public class Spawner : MonoBehaviour
         GameObject enemy = Instantiate(Enemy, spawnPosition, Quaternion.identity);
 
         enemy.GetComponent<EnemyController>().MoveSpeed *= Random.value + 1f;
-        enemy.GetComponent<EnemyController>().MoveDir.x = Random.Range(-1f, 1f);
-        enemy.GetComponent<EnemyController>().MoveDir.y = Random.Range(-1f, 1f);
+        enemy.GetComponent<EnemyController>().MoveDirection.x = Random.Range(-1f, 1f);
+        enemy.GetComponent<EnemyController>().MoveDirection.y = Random.Range(-1f, 1f);
 
         enemy.SetActive(false);
 
