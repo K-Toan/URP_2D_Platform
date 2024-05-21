@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
     public float WallJumpTime = 0.2f; // time to enable movement after wall jump
     [SerializeField] private bool canJump = true;
     [SerializeField] private bool hasJumped = false;
-    // [SerializeField] private bool useGravity = true;
 
     [Header("Dash")]
     public float DashSpeed = 20f;
@@ -33,7 +32,7 @@ public class PlayerController : MonoBehaviour
     public float WallClimbSpeed = 5f;
     public float WallSlideSpeed = 5f;
     public float WallSide;
-    public float WallJumpUpTime = 0.5f;
+    public float WallJumpUpTime = 0.25f;
     [SerializeField] private bool canClimb = true;
 
     [Header("Collision")]
