@@ -10,13 +10,13 @@ public class PlayerController : MonoBehaviour
     [Header("Move")]
     public float MoveSpeed = 10f;
     public float Acceleration = 10f;
-    public float AirAcceleration = 5f;
     public Vector2 MoveDirection;
     public Vector2 LastMoveDirection;
     [SerializeField] private bool canMove = true;
 
     [Header("Jump")]
-    public float JumpSpeed = 25f;
+    public float JumpSpeed = 20f;
+    public float AirAcceleration = 7.5f;
     public float WallJumpTime = 0.2f; // time to enable movement after wall jump
     [SerializeField] private bool canJump = true;
     [SerializeField] private bool hasJumped = false;
@@ -24,14 +24,14 @@ public class PlayerController : MonoBehaviour
     [Header("Dash")]
     public float DashSpeed = 20f;
     public float DashTime = 0.2f;
-    public float DashCooldownTime = 0.1f;
+    public float DashCooldownTime = 0.15f;
     [SerializeField] private bool canDash = true;
     [SerializeField] private bool hasDashed = false;
 
     [Header("Wall")]
+    public float WallSide;
     public float WallClimbSpeed = 5f;
     public float WallSlideSpeed = 5f;
-    public float WallSide;
     public float WallJumpUpTime = 0.25f;
     [SerializeField] private bool canClimb = true;
 
@@ -145,22 +145,18 @@ public class PlayerController : MonoBehaviour
             {
                 StartCoroutine(DisableMove(WallJumpTime));
 
-                Vector2 wallDir = onRightWall ? Vector2.left : Vector2.right;
-
-                Vector2 wallJumpDir;
                 // wall jump up
-                if (_rigidbody.velocity.y > 0)
+                if (_input.move.y > 0)
                 {
-                    wallJumpDir = Vector2.up;
                     StartCoroutine(DisableClimb(WallJumpUpTime));
+                    Jump(Vector2.up, true);
                 }
                 // wall jump
                 else
                 {
-                    wallJumpDir = wallDir / 1.5f + Vector2.up / 1.5f;
+                    Vector2 wallJumpDir = new Vector2(-WallSide, 1f).normalized;
+                    Jump(wallJumpDir, true);
                 }
-
-                Jump(wallJumpDir.normalized, true);
             }
         }
     }
