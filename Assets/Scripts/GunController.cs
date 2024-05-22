@@ -64,7 +64,7 @@ public class GunController : MonoBehaviour
     private void FireBullet()
     {
         GameObject bullet = Instantiate(Projectile, FirePosition.position, FirePosition.rotation);
-        bullet.GetComponent<Bullet>().Direction = FirePosition.right;
+        bullet.GetComponent<Bullet>().Direction = FirePosition.up;
     }
 
     private void FireProjectile()
