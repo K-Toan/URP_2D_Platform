@@ -31,6 +31,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Fire",
+                    "type": "PassThrough",
+                    "id": "23366656-d710-4b10-be26-ed86b35819ad",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -113,12 +122,12 @@
                 },
                 {
                     "name": "",
-                    "id": "f063d2e0-1c87-41d4-aa80-49da5c4f51a5",
-                    "path": "<Mouse>/rightButton",
+                    "id": "03e0f52c-870f-42c1-a4f0-26a17359985e",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Dash",
+                    "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

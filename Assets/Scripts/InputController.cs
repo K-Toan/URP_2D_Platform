@@ -7,6 +7,7 @@ public class InputController : MonoBehaviour
     public Vector2 move;
     public bool jump;
     public bool dash;
+    public bool fire;
 
     [Header("Settings")]
     public bool cursorLocked = true;
@@ -26,6 +27,11 @@ public class InputController : MonoBehaviour
         DashInput(value.isPressed);
     }
 
+    public void OnFire(InputValue value)
+    {
+        FireInput(value.isPressed);
+    }
+
     public void MoveInput(Vector2 newMoveDirection)
     {
         move = newMoveDirection;
@@ -39,6 +45,11 @@ public class InputController : MonoBehaviour
     public void DashInput(bool newSprintState)
     {
         dash = newSprintState;
+    }
+
+    public void FireInput(bool newSprintState)
+    {
+        fire = newSprintState;
     }
 
     private void OnApplicationFocus(bool hasFocus)
