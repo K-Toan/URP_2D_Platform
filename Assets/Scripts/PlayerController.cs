@@ -92,6 +92,8 @@ public class PlayerController : MonoBehaviour
 
         _ghostEffect.enabled = false;
 
+        groundLayer = Layers.GetLayer(LayerName.Environment);
+
         DashParticle.Stop();
         SlideParticle.Stop();
     }
@@ -345,6 +347,6 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage()
     {
-        transform.position = SpawnPoint.position;
+        Debug.Log("Player takes damage");
     }
 }
