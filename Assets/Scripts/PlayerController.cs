@@ -54,13 +54,13 @@ public class PlayerController : MonoBehaviour
     private Vector2 rightOffsetUpLeft = new Vector2(0.49f, 0.4f),
                     // rightOffsetUpRight = new Vector2(0.51f, 0.4f),
                     // rightOffsetDownLeft = new Vector2(0.49f, -0.5f),
-                    rightOffsetDownRight = new Vector2(0.51f, -0.5f);
+                    rightOffsetDownRight = new Vector2(0.51f, -0.4f);
     // left wall collision
     [SerializeField]
     private Vector2 leftOffsetUpLeft = new Vector2(-0.51f, 0.4f),
                     // leftOffsetUpRight = new Vector2(-0.49f, 0.4f),
                     // leftOffsetDownLeft = new Vector2(-0.51f, -0.5f),
-                    leftOffsetDownRight = new Vector2(-0.49f, -0.5f);
+                    leftOffsetDownRight = new Vector2(-0.49f, -0.4f);
 
     [Header("Particle Systems")]
     public Transform ParticleRoot;
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Guns")]
     [SerializeField] public Transform GunPosition;
-    [SerializeField] public GameObject Gun;
+    [SerializeField] public GameObject GunObject;
     [SerializeField] private GunController _gun;
     [SerializeField] private bool _hasGun;
 
@@ -88,7 +88,7 @@ public class PlayerController : MonoBehaviour
         _ghostEffect = GetComponent<GhostEffect>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
 
-        _hasGun = Gun.TryGetComponent<GunController>(out _gun);
+        _hasGun = GunObject.TryGetComponent<GunController>(out _gun);
 
         _ghostEffect.enabled = false;
 
@@ -269,7 +269,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleGun()
     {
-        if(_input.fire)
+        if (_input.fire)
         {
             _gun.Fire();
         }
@@ -316,7 +316,14 @@ public class PlayerController : MonoBehaviour
             _spriteRenderer.flipX = false;
         }
         // rotate gun system
-        GunPosition.localScale = new Vector3(_spriteRenderer.flipX ? 1f : -1f, 1f, 1f);
+        if (onWall)
+        {
+            GunPosition.localScale = new Vector3(WallSide * -1f, 1f, 1f);
+        }
+        else
+        {
+            GunPosition.localScale = new Vector3(_spriteRenderer.flipX ? 1f : -1f, 1f, 1f);
+        }
 
         // rotate particle system
         ParticleRoot.localScale = new Vector3(WallSide, 1f, 1f);
