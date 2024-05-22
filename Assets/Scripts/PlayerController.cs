@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -68,6 +69,12 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem DashParticle;
     public ParticleSystem SlideParticle;
 
+    [Header("Guns")]
+    [SerializeField] public Transform GunPosition;
+    [SerializeField] public GameObject Gun;
+    [SerializeField] private GunController _gun;
+    [SerializeField] private bool _hasGun;
+
     [Header("Components")]
     [SerializeField] private InputController _input;
     [SerializeField] private GhostEffect _ghostEffect;
@@ -81,6 +88,8 @@ public class PlayerController : MonoBehaviour
         _ghostEffect = GetComponent<GhostEffect>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
 
+        _hasGun = Gun.TryGetComponent<GunController>(out _gun);
+
         _ghostEffect.enabled = false;
 
         DashParticle.Stop();
@@ -93,6 +102,7 @@ public class PlayerController : MonoBehaviour
         WallClimb();
         HandleJump();
         HandleDash();
+        HandleGun();
         Move();
 
         HandleFlipX();
@@ -100,16 +110,12 @@ public class PlayerController : MonoBehaviour
 
     private void HandleCollision()
     {
-        // 
         Vector2 currentPosition = (Vector2)transform.position;
         // ground detection
-        // onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
         onGround = Physics2D.OverlapArea(currentPosition + bottomOffsetUpLeft, (Vector2)transform.position + bottomOffsetDownRight, groundLayer);
 
         // wall detection
-        // onRightWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer);
         onRightWall = Physics2D.OverlapArea(currentPosition + rightOffsetUpLeft, (Vector2)transform.position + rightOffsetDownRight, groundLayer);
-        // onLeftWall = Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
         onLeftWall = Physics2D.OverlapArea(currentPosition + leftOffsetUpLeft, (Vector2)transform.position + leftOffsetDownRight, groundLayer);
 
         // if player is on wall
@@ -127,6 +133,43 @@ public class PlayerController : MonoBehaviour
         if (hasDashed && onGround && canDash)
         {
             hasDashed = false;
+        }
+    }
+
+    private void WallClimb()
+    {
+        if (!canClimb)
+            return;
+
+        // check if player slides on wall
+        if (onWall && !onGround)
+        {
+            // climb up wall
+            if (_input.move.y > 0)
+            {
+                _rigidbody.velocity = new Vector2(0.0f, WallClimbSpeed);
+            }
+            // slide down wall
+            else if (_input.move.y < 0)
+            {
+                _rigidbody.velocity = new Vector2(0.0f, -WallClimbSpeed);
+            }
+
+            // start play slide particle when player slides down wall
+            if (_rigidbody.velocity.y < 0 && !SlideParticle.isPlaying)
+            {
+                SlideParticle.Play();
+            }
+            // stop slide particle when player climbs up
+            else if (_rigidbody.velocity.y > 0 && SlideParticle.isPlaying)
+            {
+                SlideParticle.Stop();
+            }
+        }
+        // stop slide particle when player does not slide on wall
+        else
+        {
+            SlideParticle.Stop();
         }
     }
 
@@ -193,41 +236,47 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void WallClimb()
+    private IEnumerator Dash(Vector2 dashDir)
     {
-        if (!canClimb)
-            return;
+        // temp
+        float gravityScale = _rigidbody.gravityScale;
 
-        // check if player slides on wall
-        if (onWall && !onGround)
-        {
-            // climb up wall
-            if (_input.move.y > 0)
-            {
-                _rigidbody.velocity = new Vector2(0.0f, WallClimbSpeed);
-            }
-            // slide down wall
-            else if (_input.move.y < 0)
-            {
-                _rigidbody.velocity = new Vector2(0.0f, -WallClimbSpeed);
-            }
+        // start play ghost effect in DashTime
+        _ghostEffect.Play(DashTime);
 
-            // start play slide particle when player slides down wall
-            if (_rigidbody.velocity.y < 0 && !SlideParticle.isPlaying)
-            {
-                SlideParticle.Play();
-            }
-            // stop slide particle when player climbs up
-            else if (_rigidbody.velocity.y > 0 && SlideParticle.isPlaying)
-            {
-                SlideParticle.Stop();
-            }
-        }
-        // stop slide particle when player does not slide on wall
-        else
+        hasDashed = true;
+        canDash = false;
+
+        // play dash particle
+        DashParticle.Play();
+        // disable gravity and move player
+        _rigidbody.gravityScale = 0f;
+        _rigidbody.velocity = dashDir.normalized * DashSpeed;
+
+        // cooldown
+        yield return new WaitForSeconds(DashTime);
+
+        // stop dash particle
+        DashParticle.Stop();
+        // disable gravity and stop player
+        _rigidbody.gravityScale = gravityScale;
+        _rigidbody.velocity = Vector2.zero;
+
+        // cooldown after dash
+        yield return new WaitForSeconds(DashCooldownTime);
+        canDash = true;
+    }
+
+    private void HandleGun()
+    {
+        if(_input.fire)
         {
-            SlideParticle.Stop();
+            _gun.Fire();
         }
+        // else if(_input.reload)
+        // {
+
+        // }
     }
 
     private void Move()
@@ -266,8 +315,10 @@ public class PlayerController : MonoBehaviour
         {
             _spriteRenderer.flipX = false;
         }
+        // rotate gun system
+        GunPosition.localScale = new Vector3(_spriteRenderer.flipX ? 1f : -1f, 1f, 1f);
 
-        // handle particle system direction
+        // rotate particle system
         ParticleRoot.localScale = new Vector3(WallSide, 1f, 1f);
     }
 
@@ -283,37 +334,6 @@ public class PlayerController : MonoBehaviour
         canClimb = false;
         yield return new WaitForSeconds(time);
         canClimb = true;
-    }
-
-    private IEnumerator Dash(Vector2 dashDir)
-    {
-        // temp
-        float gravityScale = _rigidbody.gravityScale;
-
-        // start play ghost effect in DashTime
-        _ghostEffect.Play(DashTime);
-
-        hasDashed = true;
-        canDash = false;
-
-        // play dash particle
-        DashParticle.Play();
-        // disable gravity and move player
-        _rigidbody.gravityScale = 0f;
-        _rigidbody.velocity = dashDir.normalized * DashSpeed;
-
-        // cooldown
-        yield return new WaitForSeconds(DashTime);
-
-        // stop dash particle
-        DashParticle.Stop();
-        // disable gravity and stop player
-        _rigidbody.gravityScale = gravityScale;
-        _rigidbody.velocity = Vector2.zero;
-
-        // cooldown after dash
-        yield return new WaitForSeconds(DashCooldownTime);
-        canDash = true;
     }
 
     public void TakeDamage()

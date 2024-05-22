@@ -3,7 +3,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [Header("Stats")]
-    public float Damp = 3f;
+    public float Damp = 5f;
 
     [Header("Screen shake")]
 
