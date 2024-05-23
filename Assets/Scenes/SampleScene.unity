@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 208444073}
   m_Layer: 0
-  m_Name: Particles
+  m_Name: ParticleRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -975,7 +975,7 @@ GameObject:
   m_Component:
   - component: {fileID: 693497885}
   m_Layer: 0
-  m_Name: GunPosition
+  m_Name: GunRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1822,6 +1822,7 @@ MonoBehaviour:
   JumpSpeed: 20
   AirAcceleration: 7.5
   WallJumpTime: 0.2
+  WallJumpUpTime: 0.25
   canJump: 1
   hasJumped: 0
   DashSpeed: 20
@@ -1831,9 +1832,9 @@ MonoBehaviour:
   hasDashed: 0
   isDashing: 0
   WallSide: 0
-  WallClimbSpeed: 5
-  WallSlideSpeed: 5
-  WallJumpUpTime: 0.25
+  WallClimbSpeed: 3
+  WallSlideSpeed: -2.5
+  WallSlideAcceleration: 5
   canClimb: 1
   groundLayer:
     serializedVersion: 2
@@ -11972,13 +11973,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 113790237475312082}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 208444073}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4212992984198545902
 GameObject:
   m_ObjectHideFlags: 0
@@ -19624,7 +19625,7 @@ ParticleSystem:
     strength:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.5
+      scalar: 0.25
       minScalar: 1
       maxCurve:
         serializedVersion: 2

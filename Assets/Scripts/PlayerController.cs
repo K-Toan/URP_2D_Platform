@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public float JumpSpeed = 20f;
     public float AirAcceleration = 7.5f;
     public float WallJumpTime = 0.2f; // time to enable movement after wall jump
+    public float WallJumpUpTime = 0.25f; // time to enable player to grab wall after wall jump up
     [SerializeField] private bool canJump = true;
     [SerializeField] private bool hasJumped = false;
 
@@ -31,9 +32,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("Wall")]
     public float WallSide;
-    public float WallClimbSpeed = 5f;
-    public float WallSlideSpeed = 5f;
-    public float WallJumpUpTime = 0.25f;
+    public float WallClimbSpeed = 3f;
+    public float WallSlideSpeed = -2.5f;
+    public float WallSlideAcceleration = 5f;
     [SerializeField] private bool canClimb = true;
 
     [Header("Collision")]
@@ -141,7 +142,7 @@ public class PlayerController : MonoBehaviour
         onLeftWall = Physics2D.OverlapArea(currentPosition + leftOffsetUpLeft, (Vector2)transform.position + leftOffsetDownRight, groundLayer);
 
         // if player is on wall
-        onWall = onRightWall || onLeftWall;
+        onWall = (onRightWall || onLeftWall) && canClimb;
 
         // which side player is facing
         WallSide = onRightWall ? 1f : -1f;
@@ -172,9 +173,15 @@ public class PlayerController : MonoBehaviour
                 _rigidbody.velocity = new Vector2(0.0f, WallClimbSpeed);
             }
             // slide down wall
-            else if (_input.move.y < 0)
+            // if doesn't slide down
+            else if (_input.move.y == 0)
             {
-                _rigidbody.velocity = new Vector2(0.0f, -WallClimbSpeed);
+                _rigidbody.velocity = new Vector2(0.0f, Mathf.Lerp(_rigidbody.velocity.y, WallSlideSpeed, WallSlideAcceleration * Time.deltaTime));
+            }
+            // if slide down
+            else
+            {
+                _rigidbody.velocity = new Vector2(0.0f, _rigidbody.velocity.y);
             }
 
             // start play slide particle when player slides down wall
@@ -216,14 +223,18 @@ public class PlayerController : MonoBehaviour
                     StartCoroutine(DisableClimb(WallJumpUpTime));
                     Jump(Vector2.up, true);
                 }
+                else if (_input.move.y == 0)
+                {
+                    StartCoroutine(DisableClimb(0.05f)); // disable player to grab wall instantly after jump
+                    Vector2 wallJumpDir = new Vector2(-WallSide, 1f).normalized;
+                    Jump(wallJumpDir, true);
+                }
                 // wall jump
                 else
                 {
-                    Vector2 wallJumpDir = new Vector2(-WallSide, 1f).normalized;
+                    StartCoroutine(DisableClimb(0.05f)); // disable player to grab wall instantly after jump
+                    Vector2 wallJumpDir = new Vector2(-WallSide, 0f).normalized;
                     Jump(wallJumpDir, true);
-
-                    // facing right direction when jump
-
                 }
             }
         }
@@ -299,11 +310,12 @@ public class PlayerController : MonoBehaviour
     {
         if (_input.fire)
         {
-            _gun.Fire();
+            Debug.Log("Fire");
+            // _gun.Fire();
         }
         // else if(_input.reload)
         // {
-
+            // Debug.Log("Reload");
         // }
     }
 
