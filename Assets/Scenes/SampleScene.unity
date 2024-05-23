@@ -175,7 +175,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &217969884
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1588,6 +1588,7 @@ GameObject:
   - component: {fileID: 1362387418}
   - component: {fileID: 1362387422}
   - component: {fileID: 1362387417}
+  - component: {fileID: 1362387426}
   - component: {fileID: 1362387420}
   - component: {fileID: 1362387419}
   - component: {fileID: 1362387425}
@@ -1640,13 +1641,13 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.33490568, g: 0.68163764, b: 1, a: 1}
+  m_SortingOrder: 1
+  m_Sprite: {fileID: 1555260907, guid: e05ba53dbb234324a89fd24913f21efd, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 3, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1731,9 +1732,9 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0.25}
+    oldSize: {x: 3, y: 2}
+    newSize: {x: 3, y: 2}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -1817,7 +1818,6 @@ MonoBehaviour:
   MoveSpeed: 10
   Acceleration: 10
   MoveDirection: {x: 0, y: 0}
-  LastMoveDirection: {x: 0, y: 0}
   canMove: 1
   JumpSpeed: 20
   AirAcceleration: 7.5
@@ -1829,6 +1829,7 @@ MonoBehaviour:
   DashCooldownTime: 0.15
   canDash: 1
   hasDashed: 0
+  isDashing: 0
   WallSide: 0
   WallClimbSpeed: 5
   WallSlideSpeed: 5
@@ -1854,8 +1855,7 @@ MonoBehaviour:
   SlideParticle: {fileID: 827433251955564663}
   GunPosition: {fileID: 693497885}
   GunObject: {fileID: 217969883}
-  _gun: {fileID: 0}
-  _hasGun: 0
+  _animator: {fileID: 0}
   _input: {fileID: 0}
   _ghostEffect: {fileID: 0}
   _rigidbody: {fileID: 0}
@@ -1878,6 +1878,27 @@ MonoBehaviour:
   GhostColor: {r: 0.7250323, g: 0.48584908, b: 1, a: 0.4392157}
   _ghost: {fileID: 0}
   _spriteRenderer: {fileID: 0}
+--- !u!95 &1362387426
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362387416}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2682f734ea263d944830aba9df0b7c27, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1716999543
 GameObject:
   m_ObjectHideFlags: 0

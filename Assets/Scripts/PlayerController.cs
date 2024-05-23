@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour
     public float MoveSpeed = 10f;
     public float Acceleration = 10f;
     public Vector2 MoveDirection;
-    public Vector2 LastMoveDirection;
     [SerializeField] private bool canMove = true;
 
     [Header("Jump")]
@@ -28,6 +27,7 @@ public class PlayerController : MonoBehaviour
     public float DashCooldownTime = 0.15f;
     [SerializeField] private bool canDash = true;
     [SerializeField] private bool hasDashed = false;
+    [SerializeField] private bool isDashing = false;
 
     [Header("Wall")]
     public float WallSide;
@@ -72,10 +72,19 @@ public class PlayerController : MonoBehaviour
     [Header("Guns")]
     [SerializeField] public Transform GunPosition;
     [SerializeField] public GameObject GunObject;
-    [SerializeField] private GunController _gun;
-    [SerializeField] private bool _hasGun;
+    private GunController _gun;
+    private bool _hasGun;
+
+    [Header("Animation Hashes")]
+    private int _speedXHash;
+    private int _speedYHash;
+    private int _isDashingHash;
+    private int _onGroundHash;
+    private int _onWallHash;
+    private bool _hasAnimator;
 
     [Header("Components")]
+    [SerializeField] private Animator _animator;
     [SerializeField] private InputController _input;
     [SerializeField] private GhostEffect _ghostEffect;
     [SerializeField] private Rigidbody2D _rigidbody;
@@ -87,7 +96,7 @@ public class PlayerController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody2D>();
         _ghostEffect = GetComponent<GhostEffect>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-
+        _hasAnimator = TryGetComponent<Animator>(out _animator);
         _hasGun = GunObject.TryGetComponent<GunController>(out _gun);
 
         _ghostEffect.enabled = false;
@@ -96,6 +105,16 @@ public class PlayerController : MonoBehaviour
 
         DashParticle.Stop();
         SlideParticle.Stop();
+        AssignAnimationHashes();
+    }
+
+    private void AssignAnimationHashes()
+    {
+        _speedXHash = Animator.StringToHash("SpeedX");
+        _speedYHash = Animator.StringToHash("SpeedY");
+        _isDashingHash = Animator.StringToHash("IsDashing");
+        _onGroundHash = Animator.StringToHash("OnGround");
+        _onWallHash = Animator.StringToHash("OnWall");
     }
 
     private void Update()
@@ -107,6 +126,7 @@ public class PlayerController : MonoBehaviour
         HandleGun();
         Move();
 
+        HandleAnimations();
         HandleFlipX();
     }
 
@@ -201,6 +221,9 @@ public class PlayerController : MonoBehaviour
                 {
                     Vector2 wallJumpDir = new Vector2(-WallSide, 1f).normalized;
                     Jump(wallJumpDir, true);
+
+                    // facing right direction when jump
+
                 }
             }
         }
@@ -228,7 +251,7 @@ public class PlayerController : MonoBehaviour
             // if player not inputs, dash towards face direction 
             if (dashDir == Vector2.zero)
             {
-                dashDir = new Vector2(_spriteRenderer.flipX ? 1f : -1f, 0f);
+                dashDir = new Vector2(_spriteRenderer.flipX ? -1f : 1f, 0f);
             }
 
             // disable movement and start dash
@@ -248,6 +271,7 @@ public class PlayerController : MonoBehaviour
 
         hasDashed = true;
         canDash = false;
+        isDashing = true;
 
         // play dash particle
         DashParticle.Play();
@@ -257,6 +281,8 @@ public class PlayerController : MonoBehaviour
 
         // cooldown
         yield return new WaitForSeconds(DashTime);
+
+        isDashing = false;
 
         // stop dash particle
         DashParticle.Stop();
@@ -288,12 +314,6 @@ public class PlayerController : MonoBehaviour
 
         MoveDirection = _input.move;
 
-        // store the last move direction if player does move
-        if (_input.move.x != 0 && _input.move.y != 0)
-        {
-            LastMoveDirection = MoveDirection;
-        }
-
         // change player acceleration if player has jumped
         if (!hasJumped)
         {
@@ -306,17 +326,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void HandleAnimations()
+    {
+        _animator.SetFloat(_speedXHash, Mathf.Abs(_rigidbody.velocity.x));
+        _animator.SetFloat(_speedYHash, _rigidbody.velocity.y);
+        _animator.SetBool(_isDashingHash, isDashing);
+        _animator.SetBool(_onGroundHash, onGround);
+        _animator.SetBool(_onWallHash, onWall);
+    }
+
     private void HandleFlipX()
     {
-        // handle player animation facing direction
-        if (_input.move.x > 0)
-        {
-            _spriteRenderer.flipX = true;
-        }
-        else if (_input.move.x < 0)
+        // handle player animation facing direction when running or on wall
+        if (_rigidbody.velocity.x > 0 || onRightWall)
         {
             _spriteRenderer.flipX = false;
         }
+        else if (_rigidbody.velocity.x < 0 || onLeftWall)
+        {
+            _spriteRenderer.flipX = true;
+        }
+
         // rotate gun system
         if (onWall)
         {
