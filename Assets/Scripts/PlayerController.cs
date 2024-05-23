@@ -262,7 +262,14 @@ public class PlayerController : MonoBehaviour
             // if player not inputs, dash towards face direction 
             if (dashDir == Vector2.zero)
             {
-                dashDir = new Vector2(_spriteRenderer.flipX ? -1f : 1f, 0f);
+                if (!onWall)
+                {
+                    dashDir = new Vector2(_spriteRenderer.flipX ? -1f : 1f, 0f);
+                }
+                else
+                {
+                    dashDir = new Vector2(-WallSide, 0f);
+                }
             }
 
             // disable movement and start dash
@@ -315,7 +322,7 @@ public class PlayerController : MonoBehaviour
         }
         // else if(_input.reload)
         // {
-            // Debug.Log("Reload");
+        // Debug.Log("Reload");
         // }
     }
 
