@@ -43,7 +43,8 @@ public class GhostEffect : MonoBehaviour
         {
             // instantiate Ghost Prefab
             GameObject ghost = Instantiate(_ghost, transform.position, transform.rotation);
-            ghost.GetComponent<SpriteRenderer>().sprite = _spriteRenderer.sprite; // Render sprite
+            ghost.GetComponent<SpriteRenderer>().sprite = _spriteRenderer.sprite; // pender sprite
+            ghost.GetComponent<SpriteRenderer>().flipX = _spriteRenderer.flipX; // flip sprite 
             ghost.GetComponent<SpriteRenderer>().color = GhostColor;
 
             // start fade out
