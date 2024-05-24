@@ -15,7 +15,7 @@ public class GunController : MonoBehaviour
     [SerializeField] private int ammo = 30;
     [SerializeField] private int ammoCapacity = 30;
     [SerializeField] private float timeBetweenShot = 0.1f;
-    [SerializeField] private FireMode fireMode = FireMode.Auto;
+    // [SerializeField] private FireMode fireMode = FireMode.Auto;
 
     [Header("Bullet")]
     public float BulletSpeed = 10f;
