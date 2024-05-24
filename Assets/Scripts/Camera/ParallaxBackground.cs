@@ -17,7 +17,7 @@ public class ParallaxBackground : MonoBehaviour
         }
         else
         {
-            ParallaxCamera.onCameraTranslate += Move;
+            ParallaxCamera.onCameraTranslate += MoveVector2;
         }
 
         SetLayers();
@@ -39,11 +39,11 @@ public class ParallaxBackground : MonoBehaviour
         }
     }
 
-    void Move(float delta)
+    void MoveVector2(Vector2 delta)
     {
         foreach (ParallaxLayer layer in parallaxLayers)
         {
-            layer.Move(delta);
+            layer.MoveVector2(delta);
         }
     }
 }
