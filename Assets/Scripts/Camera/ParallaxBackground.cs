@@ -3,27 +3,31 @@ using UnityEngine;
 
 public class ParallaxBackground : MonoBehaviour
 {
-    public ParallaxCamera ParallaxCamera;
+    public Camera MainCamera;
+    private ParallaxCamera _parallaxCamera;
     [SerializeField] private List<ParallaxLayer> parallaxLayers = new List<ParallaxLayer>();
 
-    void Start()
+    private void Start()
     {
-        if (ParallaxCamera == null)
-            ParallaxCamera = Camera.main.GetComponent<ParallaxCamera>();
+        MainCamera = Camera.main;
 
-        if (ParallaxCamera == null)
+        // get parallax camera script
+        if (_parallaxCamera == null)
+            _parallaxCamera = MainCamera.GetComponent<ParallaxCamera>();
+
+        if (_parallaxCamera == null)
         {
-            Debug.Log("Cannot get ParallaxCamera component");
+            Debug.Log("Cannot get _parallaxCamera component");
         }
         else
         {
-            ParallaxCamera.onCameraTranslate += MoveVector2;
+            _parallaxCamera.OnCameraTranslate += Move;
         }
 
         SetLayers();
     }
 
-    void SetLayers()
+    private void SetLayers()
     {
         parallaxLayers.Clear();
 
@@ -39,11 +43,21 @@ public class ParallaxBackground : MonoBehaviour
         }
     }
 
-    void MoveVector2(Vector2 delta)
+    private void Move(Vector2 delta)
     {
         foreach (ParallaxLayer layer in parallaxLayers)
         {
-            layer.MoveVector2(delta);
+            layer.Move(delta);
+
+            // calculate distance between camera position and true background posistion
+            float distanceX = Mathf.Abs(MainCamera.transform.position.x - layer.transform.position.x);
+
+            // reposition background
+            if(distanceX >= layer.TextureWidthX)
+            {
+                float offsetPosition = distanceX % layer.TextureWidthX;
+                layer.transform.position = new Vector3(MainCamera.transform.position.x + offsetPosition, layer.transform.position.y);
+            }
         }
     }
 }

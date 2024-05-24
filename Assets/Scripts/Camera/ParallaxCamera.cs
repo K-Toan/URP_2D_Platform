@@ -3,7 +3,7 @@ using UnityEngine;
 public class ParallaxCamera : MonoBehaviour
 {
     public delegate void ParallaxCameraDelegate(Vector2 deltaMovement);
-    public ParallaxCameraDelegate onCameraTranslate;
+    public ParallaxCameraDelegate OnCameraTranslate;
  
     private Vector3 lastPosition;
  
@@ -16,10 +16,10 @@ public class ParallaxCamera : MonoBehaviour
     {
         if (transform.position != lastPosition)
         {
-            if (onCameraTranslate != null)
+            if (OnCameraTranslate != null)
             {
                 Vector3 delta = lastPosition - transform.position;
-                onCameraTranslate(delta);
+                OnCameraTranslate(delta);
             }
  
             lastPosition = transform.position;
