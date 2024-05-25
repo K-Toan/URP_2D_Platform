@@ -32,8 +32,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Wall")]
     public float WallSide;
-    public float WallClimbSpeed = 3f;
-    public float WallSlideSpeed = -2.5f;
+    public float WallClimbSpeed = 3.5f;
+    public float WallSlideSpeed = -3f;
     public float WallSlideAcceleration = 5f;
     [SerializeField] private bool canClimb = true;
 
@@ -170,18 +170,18 @@ public class PlayerController : MonoBehaviour
             // climb up wall
             if (_input.move.y > 0)
             {
-                _rigidbody.velocity = new Vector2(0.0f, WallClimbSpeed);
+                _rigidbody.velocity = new Vector2(0.2f * WallSide, WallClimbSpeed);
             }
             // slide down wall
             // if doesn't slide down
             else if (_input.move.y == 0)
             {
-                _rigidbody.velocity = new Vector2(0.0f, Mathf.Lerp(_rigidbody.velocity.y, WallSlideSpeed, WallSlideAcceleration * Time.deltaTime));
+                _rigidbody.velocity = new Vector2(0f, Mathf.Lerp(_rigidbody.velocity.y, WallSlideSpeed, WallSlideAcceleration * Time.deltaTime));
             }
             // if slide down
             else
             {
-                _rigidbody.velocity = new Vector2(0.0f, _rigidbody.velocity.y);
+                _rigidbody.velocity = new Vector2(0f, _rigidbody.velocity.y);
             }
 
             // start play slide particle when player slides down wall
