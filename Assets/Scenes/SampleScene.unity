@@ -4021,7 +4021,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Health: 1
-  SpawnPoint: {fileID: 0}
   MoveSpeed: 10
   Acceleration: 10
   MoveDirection: {x: 0, y: 0}
@@ -4032,7 +4031,7 @@ MonoBehaviour:
   WallJumpUpTime: 0.25
   canJump: 1
   hasJumped: 0
-  DashSpeed: 20
+  DashSpeed: 25
   DashTime: 0.2
   DashCooldownTime: 0.15
   canDash: 1
@@ -4041,7 +4040,7 @@ MonoBehaviour:
   WallSide: 0
   WallClimbSpeed: 3.5
   WallSlideSpeed: -3
-  WallSlideAcceleration: 5
+  WallSlideAcceleration: 2.5
   canClimb: 1
   groundLayer:
     serializedVersion: 2

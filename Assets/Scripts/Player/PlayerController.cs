@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Stats")]
     public float Health = 1f;
-    public Transform SpawnPoint;
 
     [Header("Move")]
     public float MoveSpeed = 10f;
@@ -34,7 +33,7 @@ public class PlayerController : MonoBehaviour
     public float WallSide;
     public float WallClimbSpeed = 3.5f;
     public float WallSlideSpeed = -3f;
-    public float WallSlideAcceleration = 5f;
+    public float WallSlideAcceleration = 2.5f;
     [SerializeField] private bool canClimb = true;
 
     [Header("Collision")]
@@ -204,6 +203,9 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJump()
     {
+        if(!canJump || isDashing)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Space) && canJump)
         {
             // ground jump
@@ -281,7 +283,9 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Dash(Vector2 dashDir)
     {
-        // temp
+        // store rigidbody velocity before dash
+        float currentVelocityX = _rigidbody.velocity.x;
+        // store gravityScale
         float gravityScale = _rigidbody.gravityScale;
 
         // start play ghost effect in DashTime
@@ -304,9 +308,9 @@ public class PlayerController : MonoBehaviour
 
         // stop dash particle
         DashParticle.Stop();
-        // disable gravity and stop player
+        // disable gravity and continue moving 
         _rigidbody.gravityScale = gravityScale;
-        _rigidbody.velocity = Vector2.zero;
+        _rigidbody.velocity = new Vector2(currentVelocityX, 0f);
 
         // cooldown after dash
         yield return new WaitForSeconds(DashCooldownTime);
@@ -397,5 +401,10 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage()
     {
         Debug.Log("Player takes damage");
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+
     }
 }
